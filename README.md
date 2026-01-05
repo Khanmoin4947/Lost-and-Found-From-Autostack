@@ -1,2 +1,2 @@
 # autostack
-coming soon
+cooming soon
