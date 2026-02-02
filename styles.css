@@ -1,0 +1,417 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background-color: #ffffff;
+  color: #000000;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+.lf-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.lf-header {
+  border-bottom: 1px solid #000000;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.lf-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+}
+
+.lf-logo {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lf-nav {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.lf-nav-link {
+  border: 1px solid transparent;
+  background: transparent;
+  color: #000000;
+  padding: 0.35rem 0.85rem;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.lf-nav-link.is-active {
+  border-color: #000000;
+}
+
+.lf-nav-link:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+.lf-main {
+  padding: 2rem 1.5rem 3rem;
+}
+
+.lf-page {
+  display: none;
+}
+
+.lf-page.is-visible {
+  display: block;
+}
+
+.lf-hero {
+  padding: 3rem 0 2rem;
+}
+
+.lf-hero-text {
+  max-width: 640px;
+}
+
+.lf-hero h1 {
+  font-size: 2.5rem;
+  margin: 0 0 0.75rem;
+}
+
+.lf-hero-subtitle {
+  margin: 0 0 1.5rem;
+}
+
+.lf-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.lf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.4rem;
+  border-radius: 0;
+  border: 1px solid #000000;
+  background-color: #ffffff;
+  color: #000000;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.lf-btn-primary {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.lf-btn-secondary {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.lf-btn:hover {
+  filter: invert(1);
+}
+
+.lf-btn:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+.lf-link-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.lf-link-button:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+.lf-page-header {
+  margin-bottom: 1.5rem;
+}
+
+.lf-page-header h2 {
+  margin: 0 0 0.5rem;
+}
+
+.lf-search-panel {
+  border: 1px solid #000000;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.lf-search-row {
+  margin-bottom: 0.75rem;
+}
+
+.lf-filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+}
+
+.lf-field {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+}
+
+.lf-field-label {
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.lf-input {
+  border: 1px solid #000000;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.95rem;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.lf-input:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 0;
+}
+
+.lf-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.lf-card {
+  border: 1px solid #000000;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: #ffffff;
+}
+
+.lf-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lf-badge {
+  border: 1px solid #000000;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.lf-card-meta {
+  font-size: 0.8rem;
+}
+
+.lf-card-footer {
+  margin-top: 0.4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.lf-card-image {
+  width: 100%;
+  height: 140px;
+  border: 1px solid #000000;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.lf-card-image img {
+  max-width: 100%;
+  max-height: 100%;
+  filter: grayscale(1);
+}
+
+.lf-empty-state {
+  border: 1px dashed #000000;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.lf-toggle-group {
+  display: inline-flex;
+  border: 1px solid #000000;
+  margin-bottom: 1.5rem;
+}
+
+.lf-toggle {
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  border-right: 1px solid #000000;
+}
+
+.lf-toggle:last-child {
+  border-right: none;
+}
+
+.lf-toggle.is-active {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.lf-toggle:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+.lf-form {
+  border: 1px solid #000000;
+  padding: 1.2rem;
+}
+
+.lf-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.lf-error {
+  min-height: 1em;
+  font-size: 0.75rem;
+  color: #000000;
+}
+
+.lf-input.is-invalid {
+  border-width: 2px;
+}
+
+.lf-note {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.lf-form-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.lf-success {
+  margin-top: 1rem;
+  border: 1px solid #000000;
+  padding: 0.75rem;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.lf-success .lf-btn-secondary {
+  margin-top: 0.5rem;
+}
+
+.lf-about section {
+  margin-bottom: 1.5rem;
+}
+
+.lf-about h3 {
+  margin: 0 0 0.5rem;
+}
+
+.lf-steps {
+  padding-left: 1.1rem;
+}
+
+.lf-footer {
+  border-top: 1px solid #000000;
+  padding: 1rem 0;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.lf-link {
+  text-decoration: underline;
+}
+
+.lf-dialog {
+  border: 1px solid #000000;
+  padding: 0;
+  max-width: 480px;
+}
+
+.lf-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.lf-dialog-content {
+  padding: 1rem;
+}
+
+.lf-dialog-close {
+  border: none;
+  background-color: #ffffff;
+  color: #000000;
+  position: absolute;
+  top: 0.35rem;
+  right: 0.5rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.lf-dialog-close:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .lf-header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .lf-main {
+    padding-inline: 1rem;
+  }
+}
+
