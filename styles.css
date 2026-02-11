@@ -36,7 +36,7 @@ a:focus-visible {
 
 .lf-header {
   border-bottom: 1px solid #000000;
-  background-color: #ffffff;
+  background-color: #fffbfb;
   position: sticky;
   top: 0;
   z-index: 10;
