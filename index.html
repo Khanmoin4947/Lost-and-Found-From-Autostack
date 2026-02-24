@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lost &amp; Found</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="lf-header">
+      <div class="lf-container lf-header-inner">
+        <div class="lf-logo">Lost &amp; Found</div>
+        <nav class="lf-nav" aria-label="Main navigation">
+          <button class="lf-nav-link is-active" data-route="home">Home</button>
+          <button class="lf-nav-link" data-route="items">Items</button>
+          <button class="lf-nav-link" data-route="report">Report</button>
+          <button class="lf-nav-link" data-route="about">About Us</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="lf-main lf-container">
+      <!-- Home -->
+      <section id="page-home" class="lf-page is-visible" aria-labelledby="home-title">
+        <div class="lf-hero">
+          <div class="lf-hero-text">
+            <h1 id="home-title">Lost &amp; Found</h1>
+            <p class="lf-hero-subtitle">
+              Report lost items, list found belongings, and browse all current reports in one simple, monochrome interface.
+            </p>
+            <div class="lf-hero-actions">
+              <button class="lf-btn lf-btn-primary" data-route="report" data-report-type="lost">
+                Report Lost Item
+              </button>
+              <button class="lf-btn lf-btn-secondary" data-route="report" data-report-type="found">
+                Report Found Item
+              </button>
+            </div>
+            <button class="lf-link-button" data-route="items">
+              Browse all items
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Items -->
+      <section id="page-items" class="lf-page" aria-labelledby="items-title">
+        <header class="lf-page-header">
+          <h2 id="items-title">Items</h2>
+          <p>Browse all reported lost and found items. Use search and filters to narrow results.</p>
+        </header>
+
+        <section class="lf-search-panel" aria-label="Search and filters">
+          <div class="lf-search-row">
+            <label class="lf-field">
+              <span class="lf-field-label">Search</span>
+              <input
+                id="search-query"
+                type="search"
+                class="lf-input"
+                placeholder="Search by title, category, description, or location"
+              />
+            </label>
+          </div>
+          <div class="lf-filter-row">
+            <label class="lf-field">
+              <span class="lf-field-label">Category</span>
+              <select id="filter-category" class="lf-input">
+                <option value="">All categories</option>
+              </select>
+            </label>
+            <label class="lf-field">
+              <span class="lf-field-label">Status</span>
+              <select id="filter-status" class="lf-input">
+                <option value="">Lost &amp; Found</option>
+                <option value="lost">Lost</option>
+                <option value="found">Found</option>
+              </select>
+            </label>
+            <label class="lf-field">
+              <span class="lf-field-label">From date</span>
+              <input id="filter-from-date" type="date" class="lf-input" />
+            </label>
+            <label class="lf-field">
+              <span class="lf-field-label">To date</span>
+              <input id="filter-to-date" type="date" class="lf-input" />
+            </label>
+          </div>
+        </section>
+
+        <section aria-live="polite">
+          <div id="items-empty" class="lf-empty-state" hidden>
+            <p>No items match your search.</p>
+            <button id="clear-search" class="lf-btn lf-btn-secondary">
+              Clear search and filters
+            </button>
+          </div>
+
+          <div id="items-grid" class="lf-items-grid" aria-label="Item results"></div>
+        </section>
+
+        <dialog id="item-detail" class="lf-dialog" aria-label="Item details">
+          <button class="lf-dialog-close" type="button" data-close-dialog>&times;</button>
+          <div class="lf-dialog-content" id="item-detail-content"></div>
+        </dialog>
+      </section>
+
+      <!-- Report -->
+      <section id="page-report" class="lf-page" aria-labelledby="report-title">
+        <header class="lf-page-header">
+          <h2 id="report-title">Report an Item</h2>
+          <p>Choose whether you are reporting a lost item or an item you have found.</p>
+        </header>
+
+        <div class="lf-toggle-group" role="tablist" aria-label="Report type">
+          <button
+            id="tab-lost"
+            class="lf-toggle is-active"
+            role="tab"
+            aria-selected="true"
+            data-report-type="lost"
+          >
+            Report a Lost Item
+          </button>
+          <button
+            id="tab-found"
+            class="lf-toggle"
+            role="tab"
+            aria-selected="false"
+            data-report-type="found"
+          >
+            Report a Found Item
+          </button>
+        </div>
+
+        <form id="report-form" novalidate class="lf-form" aria-label="Report item form">
+          <input type="hidden" id="report-status" value="lost" />
+
+          <div class="lf-form-grid">
+            <label class="lf-field">
+              <span class="lf-field-label">Title<span aria-hidden="true">*</span></span>
+              <input id="field-title" type="text" class="lf-input" required />
+              <span class="lf-error" id="error-title"></span>
+            </label>
+
+            <label class="lf-field">
+              <span class="lf-field-label">Category<span aria-hidden="true">*</span></span>
+              <select id="field-category" class="lf-input" required>
+                <option value="">Select a category</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Documents">Documents</option>
+                <option value="Keys">Keys</option>
+                <option value="Others">Others</option>
+              </select>
+              <span class="lf-error" id="error-category"></span>
+            </label>
+          </div>
+
+          <label class="lf-field">
+            <span class="lf-field-label">Description<span aria-hidden="true">*</span></span>
+            <textarea id="field-description" class="lf-input" rows="4" required></textarea>
+            <span class="lf-error" id="error-description"></span>
+          </label>
+
+          <div class="lf-form-grid">
+            <label class="lf-field">
+              <span class="lf-field-label">
+                Date <span id="label-date-kind">lost</span><span aria-hidden="true">*</span>
+              </span>
+              <input id="field-date" type="date" class="lf-input" required />
+              <span class="lf-error" id="error-date"></span>
+            </label>
+
+            <label class="lf-field">
+              <span class="lf-field-label">
+                Location <span id="label-location-kind">lost</span><span aria-hidden="true">*</span>
+              </span>
+              <input id="field-location" type="text" class="lf-input" required />
+              <span class="lf-error" id="error-location"></span>
+            </label>
+          </div>
+
+          <div class="lf-form-grid">
+            <label class="lf-field">
+              <span class="lf-field-label">Contact name<span aria-hidden="true">*</span></span>
+              <input id="field-contact-name" type="text" class="lf-input" required />
+              <span class="lf-error" id="error-contact-name"></span>
+            </label>
+
+            <label class="lf-field">
+              <span class="lf-field-label">Contact email</span>
+              <input id="field-contact-email" type="email" class="lf-input" />
+              <span class="lf-error" id="error-contact-email"></span>
+            </label>
+          </div>
+
+          <label class="lf-field">
+            <span class="lf-field-label">Contact phone</span>
+            <input id="field-contact-phone" type="tel" class="lf-input" />
+            <span class="lf-error" id="error-contact-phone"></span>
+          </label>
+
+          <label class="lf-field">
+            <span class="lf-field-label">Image URL (optional)</span>
+            <input
+              id="field-image-url"
+              type="url"
+              class="lf-input"
+              placeholder="Link to a black &amp; white or desaturated image"
+            />
+            <span class="lf-error" id="error-image-url"></span>
+          </label>
+
+          <p class="lf-note">
+            Fields marked with <span aria-hidden="true">*</span> are required.
+          </p>
+
+          <div class="lf-form-actions">
+            <button type="submit" class="lf-btn lf-btn-primary">
+              Submit report
+            </button>
+          </div>
+
+          <div id="report-success" class="lf-success" hidden>
+            <p>Your report has been submitted.</p>
+            <button type="button" class="lf-btn lf-btn-secondary" data-route="items">
+              View item in list
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- About -->
+      <section id="page-about" class="lf-page" aria-labelledby="about-title">
+        <header class="lf-page-header">
+          <h2 id="about-title">About Us</h2>
+        </header>
+
+        <article class="lf-about">
+          <section>
+            <h3>Our mission</h3>
+            <p>
+              This Lost &amp; Found service exists to reconnect people with the belongings that matter to them most.
+              By providing a simple, focused space for reporting lost and found items, we help reduce stress and speed
+              up reunions.
+            </p>
+          </section>
+
+          <section>
+            <h3>How it works</h3>
+            <ol class="lf-steps">
+              <li>Report items you have lost or found using the Report page.</li>
+              <li>Browse the Items page to look for matches.</li>
+              <li>Use the contact details on each item card to reach out.</li>
+              <li>Arrange a safe handover in a public place.</li>
+              <li>Mark the item as resolved (if functionality is later added).</li>
+            </ol>
+          </section>
+
+          <section>
+            <h3>Privacy &amp; safety</h3>
+            <p>
+              Only share contact details you are comfortable making visible. When meeting someone to exchange an item,
+              choose a well-lit public location and, if possible, bring another person with you.
+            </p>
+          </section>
+
+          <section>
+            <h3>Contact</h3>
+            <p>
+              For questions about this website, you can reach the administrators at
+              <a href="mailto:admin@lostandfound.example" class="lf-link">admin@lostandfound.example</a>.
+            </p>
+          </section>
+        </article>
+      </section>
+    </main>
+
+    <footer class="lf-footer">
+      <div class="lf-container">
+        <p>&copy; <span id="year"></span> Lost &amp; Found. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+  </html>
+
