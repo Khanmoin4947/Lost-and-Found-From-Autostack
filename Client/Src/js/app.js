@@ -1,5 +1,5 @@
-// Data model and storage
-const STORAGE_KEY = "lf-items";
+// Data model and API
+const API_BASE = "/api";
 
 /** @typedef {{
  * id: string;
@@ -19,176 +19,31 @@ const STORAGE_KEY = "lf-items";
 /** @type {Item[]} */
 let items = [];
 
-const seedItems = [
-  {
-    id: "1",
-    status: "lost",
-    title: "Black Wallet",
-    category: "Accessories",
-    description: "Slim black leather wallet with several cards and an ID inside.",
-    date: "2026-01-15",
-    location: "Main Library Entrance",
-    contactName: "Aisha Khan",
-    contactEmail: "aisha@example.com",
-    contactPhone: "",
-    imageUrl: "",
-  },
-  {
-    id: "2",
-    status: "found",
-    title: "Campus ID Card",
-    category: "Documents",
-    description: "Student ID card with the name partially visible. Found near cafeteria.",
-    date: "2026-01-18",
-    location: "Central Cafeteria",
-    contactName: "Mohit Verma",
-    contactEmail: "",
-    contactPhone: "+91 98765 43210",
-    imageUrl: "",
-  },
-  {
-    id: "3",
-    status: "lost",
-    title: "Silver Laptop",
-    category: "Electronics",
-    description: "13-inch silver laptop in a black sleeve, may have stickers on the lid.",
-    date: "2026-01-20",
-    location: "Computer Lab 2",
-    contactName: "Riya Sharma",
-    contactEmail: "riya@example.com",
-    contactPhone: "",
-    imageUrl: "",
-  },
-  {
-    id: "4",
-    status: "found",
-    title: "Keychain with Multiple Keys",
-    category: "Keys",
-    description: "Metal keychain with three keys and a small torch.",
-    date: "2026-01-19",
-    location: "Parking Area B",
-    contactName: "Arjun Patel",
-    contactEmail: "arjun@example.com",
-    contactPhone: "",
-    imageUrl: "",
-  },
-  {
-    id: "5",
-    status: "lost",
-    title: "Black Hoodie",
-    category: "Clothing",
-    description: "Plain black hoodie, medium size, no visible logo.",
-    date: "2026-01-12",
-    location: "Gym Changing Room",
-    contactName: "Neha Singh",
-    contactEmail: "",
-    contactPhone: "+91 91234 56789",
-    imageUrl: "",
-  },
-  {
-    id: "6",
-    status: "found",
-    title: "Earbuds Case",
-    category: "Electronics",
-    description: "Small wireless earbuds case, black, without earbuds inside.",
-    date: "2026-01-10",
-    location: "Bus Stop Near Gate 1",
-    contactName: "Karan Gupta",
-    contactEmail: "karan@example.com",
-    contactPhone: "",
-    imageUrl: "",
-  },
-  {
-    id: "7",
-    status: "lost",
-    title: "Notebook with Graph Paper",
-    category: "Documents",
-    description: "Spiral notebook filled with engineering notes and diagrams.",
-    date: "2026-01-09",
-    location: "Lecture Hall A3",
-    contactName: "Simran Kaur",
-    contactEmail: "simran@example.com",
-    contactPhone: "",
-    imageUrl: "",
-  },
-  {
-    id: "8",
-    status: "found",
-    title: "Sports Water Bottle",
-    category: "Accessories",
-    description: "Black and white bottle, reusable, left near the basketball court.",
-    date: "2026-01-14",
-    location: "Sports Complex",
-    contactName: "Dev Mishra",
-    contactEmail: "",
-    contactPhone: "+91 96543 21098",
-    imageUrl: "",
-  },
-  {
-    id: "9",
-    status: "lost",
-    title: "Scientific Calculator",
-    category: "Electronics",
-    description: "Standard black scientific calculator with worn-out buttons.",
-    date: "2026-01-11",
-    location: "Exam Hall C",
-    contactName: "Rahul Mehta",
-    contactEmail: "rahul@example.com",
-    contactPhone: "",
-    imageUrl: "",
-  },
-  {
-    id: "10",
-    status: "found",
-    title: "Black Backpack",
-    category: "Accessories",
-    description: "Medium-sized backpack with notebooks and pens inside.",
-    date: "2026-01-16",
-    location: "Canteen Seating Area",
-    contactName: "Priya Das",
-    contactEmail: "priya@example.com",
-    contactPhone: "",
-    imageUrl: "",
-  },
-  {
-    id: "11",
-    status: "lost",
-    title: "Ring with Simple Band",
-    category: "Accessories",
-    description: "Plain metallic ring, sentimental value.",
-    date: "2026-01-08",
-    location: "Garden Benches",
-    contactName: "Ankit Rao",
-    contactEmail: "",
-    contactPhone: "+91 99887 66554",
-    imageUrl: "",
-  },
-];
-
-function loadItems() {
+async function loadItems() {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      items = seedItems;
-      return;
-    }
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length) {
-      items = parsed;
-    } else {
-      items = seedItems;
-    }
+    const response = await fetch(`${API_BASE}/items`);
+    if (!response.ok) throw new Error("Failed to load items");
+    const data = await response.json();
+    items = Array.isArray(data) ? data : [];
   } catch {
-    items = seedItems;
+    items = [];
   }
 }
 
-function saveItems() {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch {
-    // ignore storage errors
+async function createItem(payload) {
+  const response = await fetch(`${API_BASE}/items`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create item");
   }
+
+  return response.json();
 }
 
 // Routing
@@ -635,35 +490,43 @@ function validateReportForm() {
 }
 
 if (reportForm) {
-  reportForm.addEventListener("submit", (evt) => {
+  reportForm.addEventListener("submit", async (evt) => {
     evt.preventDefault();
     if (!validateReportForm()) return;
 
-    const status = reportStatusInput?.value === "found" ? "found" : "lost";
-    const newItem = {
-      id: String(Date.now()),
-      status,
-      title: fieldTitle?.value.trim() || "",
-      category: fieldCategory?.value || "",
-      description: fieldDescription?.value.trim() || "",
-      date: fieldDate?.value || "",
-      location: fieldLocation?.value.trim() || "",
-      contactName: fieldContactName?.value.trim() || "",
-      contactEmail: fieldContactEmail?.value.trim() || "",
-      contactPhone: fieldContactPhone?.value.trim() || "",
-      imageUrl: fieldImageUrl?.value.trim() || "",
-    };
+    try {
+      const status = reportStatusInput?.value === "found" ? "found" : "lost";
+      const newItemPayload = {
+        status,
+        title: fieldTitle?.value.trim() || "",
+        category: fieldCategory?.value || "",
+        description: fieldDescription?.value.trim() || "",
+        date: fieldDate?.value || "",
+        location: fieldLocation?.value.trim() || "",
+        contactName: fieldContactName?.value.trim() || "",
+        contactEmail: fieldContactEmail?.value.trim() || "",
+        contactPhone: fieldContactPhone?.value.trim() || "",
+        imageUrl: fieldImageUrl?.value.trim() || "",
+      };
 
-    items.unshift(newItem);
-    saveItems();
-    populateCategoryFilter();
-    renderItems();
+      const createdItem = await createItem(newItemPayload);
+      items.unshift(createdItem);
+      populateCategoryFilter();
+      renderItems();
 
-    if (successBox) {
-      successBox.hidden = false;
+      if (successBox) {
+        successBox.hidden = false;
+        successBox.textContent = "Report submitted successfully.";
+      }
+
+      reportForm.reset();
+      clearErrors();
+    } catch {
+      if (successBox) {
+        successBox.hidden = false;
+        successBox.textContent = "Could not submit report. Please try again.";
+      }
     }
-    reportForm.reset();
-    clearErrors();
   });
 }
 
@@ -674,8 +537,12 @@ if (yearSpan) {
 }
 
 // Initialisation
-loadItems();
-populateCategoryFilter();
-renderItems();
-showPage("home");
+async function initialise() {
+  await loadItems();
+  populateCategoryFilter();
+  renderItems();
+  showPage("home");
+}
+
+initialise();
 
