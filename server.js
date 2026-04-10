@@ -16,7 +16,7 @@ app.use(express.static(__dirname));
 
 // Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCuPRRtuMcf-sNuLdGyGU2Yheje_k2D4YI",
+  apiKey: "API_KEY",
   authDomain: "lost-and-found-7203c.firebaseapp.com",
   projectId: "lost-and-found-7203c",
   storageBucket: "lost-and-found-7203c.firebasestorage.app",
