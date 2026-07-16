@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
+require('dotenv').config();
 const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, getDocs, addDoc, serverTimestamp } = require('firebase/firestore');
 
@@ -16,23 +17,28 @@ app.use(express.static(__dirname));
 
 // Firebase Configuration
 const firebaseConfig = {
-  apiKey: "API_KEY",
-  authDomain: "lost-and-found-7203c.firebaseapp.com",
-  projectId: "lost-and-found-7203c",
-  storageBucket: "lost-and-found-7203c.firebasestorage.app",
-  messagingSenderId: "300041676634",
-  appId: "1:300041676634:web:505fbb7b5991ff2358b563"
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
-const itemsCol = collection(db, "items");
+const firebaseConfigured = Object.values(firebaseConfig).every(Boolean);
+const itemsCol = firebaseConfigured
+  ? collection(getFirestore(initializeApp(firebaseConfig)), 'items')
+  : null;
 
 // Cloudinary Unsigned Upload Credentials
-const CLOUDINARY_CLOUD_NAME = "dltwp5ioc";
-const CLOUDINARY_UPLOAD_PRESET = "finditbymoin";
+const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_UPLOAD_PRESET = process.env.CLOUDINARY_UPLOAD_PRESET;
 
 async function uploadImageUnsigned(buffer, originalname) {
+  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
+    throw new Error('Image uploads are not configured');
+  }
+
   const formData = new FormData();
   const blob = new Blob([buffer]);
   formData.append("file", blob, originalname);
@@ -52,12 +58,40 @@ async function uploadImageUnsigned(buffer, originalname) {
 }
 
 // Multer setup for handling file uploads in memory
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, callback) => {
+    callback(null, ['image/jpeg', 'image/png'].includes(file.mimetype));
+  }
+});
+
+function requireFirebase(req, res, next) {
+  if (!itemsCol) {
+    return res.status(503).json({
+      error: 'The item service is not configured. Add Firebase settings to .env.'
+    });
+  }
+  next();
+}
+
+function validateItem(item) {
+  const requiredFields = ['status', 'title', 'category', 'description', 'date', 'location', 'contactName'];
+  const missingField = requiredFields.find((field) => !item[field]?.trim());
+  if (missingField) return `${missingField} is required`;
+  if (!['lost', 'found'].includes(item.status)) return 'status must be lost or found';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(item.date)) return 'date must use YYYY-MM-DD';
+  if (item.contactEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(item.contactEmail)) {
+    return 'contactEmail must be a valid email address';
+  }
+  if (!item.contactEmail && !item.contactPhone) return 'an email address or phone number is required';
+  return null;
+}
 
 // --- Routes ---
 
 // GET /api/items - Fetch all items from Firestore
-app.get('/api/items', async (req, res) => {
+app.get('/api/items', requireFirebase, async (req, res) => {
   try {
     const snapshot = await getDocs(itemsCol);
     const items = snapshot.docs.map(doc => {
@@ -78,32 +112,32 @@ app.get('/api/items', async (req, res) => {
 });
 
 // POST /api/items - Create a new item
-app.post('/api/items', upload.single('image'), async (req, res) => {
+app.post('/api/items', requireFirebase, upload.single('image'), async (req, res) => {
   try {
     const {
       status, title, category, description, date,
       location, contactName, contactEmail, contactPhone
     } = req.body;
 
-    let imageUrl = "";
-
-    // Upload image to Cloudinary if it exists
-    if (req.file) {
-      imageUrl = await uploadImageUnsigned(req.file.buffer, req.file.originalname);
-    }
-
     const newItem = {
-      status: status || "",
-      title: title || "",
-      category: category || "",
-      description: description || "",
-      date: date || "",
-      location: location || "",
-      contactName: contactName || "",
-      contactEmail: contactEmail || "",
-      contactPhone: contactPhone || "",
-      imageUrl
+      status: status?.trim() || '',
+      title: title?.trim() || '',
+      category: category?.trim() || '',
+      description: description?.trim() || '',
+      date: date?.trim() || '',
+      location: location?.trim() || '',
+      contactName: contactName?.trim() || '',
+      contactEmail: contactEmail?.trim() || '',
+      contactPhone: contactPhone?.trim() || '',
+      imageUrl: ''
     };
+
+    const validationError = validateItem(newItem);
+    if (validationError) return res.status(400).json({ error: validationError });
+
+    if (req.file) {
+      newItem.imageUrl = await uploadImageUnsigned(req.file.buffer, req.file.originalname);
+    }
 
     const docRef = await addDoc(itemsCol, {
       ...newItem,
@@ -117,6 +151,17 @@ app.post('/api/items', upload.single('image'), async (req, res) => {
     console.error("Error saving item:", error);
     res.status(500).json({ error: "Failed to save item" });
   }
+});
+
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ error: 'Image files must be 5 MB or smaller' });
+  }
+  if (error) {
+    console.error('Unexpected request error:', error);
+    return res.status(500).json({ error: 'Unexpected server error' });
+  }
+  next();
 });
 
 // Start Server

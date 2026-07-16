@@ -1,17 +1,18 @@
-// ===================== DATA =====================
 let items = [];
 
-// ===================== LOAD ITEMS FROM API =====================
 async function loadItems() {
   try {
     const response = await fetch('/api/items');
     if (!response.ok) throw new Error("Failed to fetch");
     items = await response.json();
-    // Sort items by createdAt descending (newest first)
     items.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
   } catch (err) {
     console.error("Failed to load from API:", err);
     items = [];
+    const emptyMessage = itemsEmpty?.querySelector("p");
+    if (emptyMessage) {
+      emptyMessage.textContent = "Items are temporarily unavailable. Please try again later.";
+    }
   }
 
   populateCategoryFilter();
@@ -53,7 +54,6 @@ function handleRouteClick(evt) {
 
 document.body.addEventListener("click", handleRouteClick);
 
-// Items rendering and filtering
 const itemsGrid = document.getElementById("items-grid");
 const itemsEmpty = document.getElementById("items-empty");
 const clearSearchBtn = document.getElementById("clear-search");
@@ -183,11 +183,9 @@ function renderItems() {
 
     const meta = document.createElement("div");
     meta.className = "lf-card-meta";
-    meta.innerHTML = `
-      <div><strong>Category:</strong> ${item.category}</div>
-      <div><strong>Date:</strong> ${item.date}</div>
-      <div><strong>Location:</strong> ${item.location}</div>
-    `;
+    appendDetail(meta, "Category", item.category);
+    appendDetail(meta, "Date", item.date);
+    appendDetail(meta, "Location", item.location);
 
     const footer = document.createElement("div");
     footer.className = "lf-card-footer";
@@ -197,7 +195,6 @@ function renderItems() {
     detailHint.textContent = "View details";
     footer.appendChild(contact);
     footer.appendChild(detailHint);
-
     card.appendChild(header);
     card.appendChild(imageWrapper);
     card.appendChild(meta);
@@ -210,6 +207,15 @@ function renderItems() {
 // Item detail dialog
 const detailDialog = document.getElementById("item-detail");
 const detailContent = document.getElementById("item-detail-content");
+
+function appendDetail(container, label, value) {
+  const row = document.createElement("div");
+  const labelElement = document.createElement("strong");
+  labelElement.textContent = `${label}: `;
+  row.appendChild(labelElement);
+  row.append(String(value || "Not provided"));
+  container.appendChild(row);
+}
 
 function openItemDetail(id) {
   if (!detailDialog || !detailContent) return;
@@ -244,15 +250,13 @@ function openItemDetail(id) {
 
   const details = document.createElement("div");
   details.className = "lf-card-meta";
-  details.innerHTML = `
-    <div><strong>Category:</strong> ${item.category}</div>
-    <div><strong>Date:</strong> ${item.date}</div>
-    <div><strong>Location:</strong> ${item.location}</div>
-    <div style="margin-top:0.5rem;"><strong>Description:</strong><br/>${item.description}</div>
-    <div style="margin-top:0.5rem;"><strong>Contact name:</strong> ${item.contactName}</div>
-    <div><strong>Email:</strong> ${item.contactEmail || "Not provided"}</div>
-    <div><strong>Phone:</strong> ${item.contactPhone || "Not provided"}</div>
-  `;
+  appendDetail(details, "Category", item.category);
+  appendDetail(details, "Date", item.date);
+  appendDetail(details, "Location", item.location);
+  appendDetail(details, "Description", item.description);
+  appendDetail(details, "Contact name", item.contactName);
+  appendDetail(details, "Email", item.contactEmail);
+  appendDetail(details, "Phone", item.contactPhone);
 
   detailContent.appendChild(header);
   detailContent.appendChild(imageWrapper);
@@ -380,6 +384,7 @@ function clearErrors() {
     fieldContactName,
     fieldContactEmail,
     fieldContactPhone,
+    fieldImageFile,
   ].forEach((field) => field && field.classList.remove("is-invalid"));
 
   [
@@ -391,6 +396,7 @@ function clearErrors() {
     errorContactName,
     errorContactEmail,
     errorContactPhone,
+    errorImageUrl,
   ].forEach((el) => {
     if (el) el.textContent = "";
   });
@@ -448,6 +454,24 @@ function validateReportForm() {
     }
   }
 
+  if (!fieldContactEmail?.value.trim() && !fieldContactPhone?.value.trim()) {
+    isValid = false;
+    fieldContactEmail?.classList.add("is-invalid");
+    fieldContactPhone?.classList.add("is-invalid");
+    if (errorContactEmail) {
+      errorContactEmail.textContent = "Provide an email address or phone number.";
+    }
+  }
+
+  const imageFile = fieldImageFile?.files[0];
+  if (imageFile && !["image/jpeg", "image/png"].includes(imageFile.type)) {
+    isValid = false;
+    if (errorImageUrl) errorImageUrl.textContent = "Use a PNG or JPEG image.";
+  } else if (imageFile && imageFile.size > 5 * 1024 * 1024) {
+    isValid = false;
+    if (errorImageUrl) errorImageUrl.textContent = "Image files must be 5 MB or smaller.";
+  }
+
 
 
   return isValid;
@@ -487,6 +511,7 @@ if (reportForm) {
 
       if (successBox) successBox.hidden = false;
       reportForm.reset();
+      setReportType("lost");
       clearErrors();
     } catch (err) {
       console.error("Failed to save item:", err);

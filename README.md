@@ -11,13 +11,18 @@ A simple, strictly black-and-white Lost &amp; Found website with four pages: Hom
 
 ### Tech stack
 
-- Plain HTML, CSS, and JavaScript.
-- Items are stored in `localStorage` with realistic seed data (10+ items) for first load.
+- Plain HTML, CSS, and JavaScript frontend.
+- Express API backed by Firebase Firestore.
+- Optional image uploads through Cloudinary.
 
-### Running the project
+### Setup and running
 
-- **Option 1 (simplest)**: Open `index.html` directly in your browser (double-click or drag into a window).
-- **Option 2 (recommended)**: Serve via a simple static server (for example, using `npx serve` in this folder) and open the provided URL.
+1. Copy `.env.example` to `.env` and fill in the Firebase settings. The Firebase project must allow the server's requests through its Firestore rules.
+2. To enable image uploads, also add the Cloudinary cloud name and unsigned upload preset. Reports without images work without these two settings.
+3. Install dependencies with `npm install`, then start the app with `npm start`.
+4. Open `http://localhost:3000`.
+
+Run `npm run check` to perform JavaScript syntax checks.
 
 ### Notes
 
