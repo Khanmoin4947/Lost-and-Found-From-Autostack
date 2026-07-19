@@ -5,6 +5,9 @@ require('dotenv').config();
 const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, getDocs, addDoc, serverTimestamp } = require('firebase/firestore');
 
+const path = require('path');
+const fs = require('fs');
+
 // Initialize Express App
 const app = express();
 const port = process.env.PORT || 3000;
@@ -12,8 +15,14 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-// Serve the frontend statically from the current directory
-app.use(express.static(__dirname));
+
+// Serve static frontend build if present, otherwise serve current dir
+const distPath = path.join(__dirname, 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+} else {
+  app.use(express.static(__dirname));
+}
 
 // Firebase Configuration
 const firebaseConfig = {
