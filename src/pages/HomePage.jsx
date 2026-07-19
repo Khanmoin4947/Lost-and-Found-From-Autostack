@@ -8,9 +8,6 @@ export default function HomePage({ items, setActiveRoute, setReportType, onSelec
   return (
     <div className="container">
       <section className="hero">
-        <div className="hero-pill">
-          <Sparkles size={16} /> Reconnecting Belongings Effortlessly
-        </div>
 
         <h1 className="hero-title">
           Lost & <span>Found</span> Community Portal
