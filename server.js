@@ -177,3 +177,7 @@ app.use((error, req, res, next) => {
 app.listen(port, () => {
   console.log(`Backend server running on http://localhost:${port}`);
 });
+
+
+console.log(process.env.CLOUDINARY_CLOUD_NAME);
+console.log(process.env.FIREBASE_PROJECT_ID);
