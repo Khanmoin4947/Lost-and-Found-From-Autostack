@@ -58,11 +58,14 @@ async function uploadImageUnsigned(buffer, originalname) {
     { method: "POST", body: formData }
   );
 
+  const data = await response.json().catch(() => ({}));
+
   if (!response.ok) {
-    throw new Error('Failed to upload image to Cloudinary');
+    const message = data.error?.message || 'Failed to upload image to Cloudinary';
+    console.error('Cloudinary upload failed:', message);
+    throw new Error(`Cloudinary error: ${message}`);
   }
 
-  const data = await response.json();
   return data.secure_url;
 }
 
@@ -158,7 +161,7 @@ app.post('/api/items', requireFirebase, upload.single('image'), async (req, res)
     res.status(201).json(newItem);
   } catch (error) {
     console.error("Error saving item:", error);
-    res.status(500).json({ error: "Failed to save item" });
+    res.status(500).json({ error: error.message || "Failed to save item" });
   }
 });
 
@@ -177,7 +180,3 @@ app.use((error, req, res, next) => {
 app.listen(port, () => {
   console.log(`Backend server running on http://localhost:${port}`);
 });
-
-
-console.log(process.env.CLOUDINARY_CLOUD_NAME);
-console.log(process.env.FIREBASE_PROJECT_ID);
